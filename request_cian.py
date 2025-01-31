@@ -87,11 +87,29 @@ def get_description(xml, kol: int) -> list[str]:
             if el:
                 exits_description = True
                 description.append(el[0].text)
-                continue
+                break
         if not exits_description:
             description.append("nothing")
 
     return description
+
+
+def get_price(xml, kol: int) -> list[str]:
+    price = []
+    for i in range(1, kol):
+        exist_price = False
+        for j in range(1, 7):
+            path = f'//*[@id="frontend-serp"]/div/div/div[4]/div[{i}]/div/article/div[1]/div/div[1]/div/div[{j}]/div[1]/span/span'
+            el = xml.xpath(path)
+            if el:
+                exist_price = True
+                price.append(el[0].text)
+                break
+        if not exist_price:
+            price.append("nothing")
+
+    return price
+
 
 
 def parse_all_data(url):
@@ -106,6 +124,8 @@ def parse_all_data(url):
     [print(el) for el in get_about_text(xml, 20)]
     print("\n\n\n")
     [print(el) for el in get_description(xml, kol=20)]
+    print("\n\n\n")
+    [print(el) for el in get_price(xml, kol=20)]
 
 
 
