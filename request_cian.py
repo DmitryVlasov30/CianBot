@@ -5,7 +5,7 @@ from bs4 import BeautifulSoup
 
 def get_link(xml, kol: int) -> list:
     xpath_link = []
-    for i in range(1, kol):
+    for i in range(1, kol+1):
         path = f'//*[@id="frontend-serp"]/div/div/div[4]/div[{i}]/div/article/div[1]/div/div[1]/div/div[1]/a'
         el = xml.xpath(path)
         if not el:
@@ -18,7 +18,7 @@ def get_link(xml, kol: int) -> list:
 
 def get_main_photo(xml, kol: int) -> list:
     xpath_photo = []
-    for i in range(1, kol):
+    for i in range(1, kol+1):
         path = f'//*[@id="frontend-serp"]/div/div/div[4]/div[{i}]/div/article/div[1]/a/div[1]/div/ul/li[1]/div/img'
         el = xml.xpath(path)
         if not el:
@@ -31,7 +31,7 @@ def get_main_photo(xml, kol: int) -> list:
 
 def get_underground(xml, kol: int) -> list[dict]:
     underground = []
-    for i in range(1, kol):
+    for i in range(1, kol+1):
         path = (f'//*[@id="frontend-serp"]/div/div/div[4]/div[{i}]/div/article/div[1]/div/div[1]/div/div[2]/div['
                 f'1]/a/div[2]')
         path_time = f'//*[@id="frontend-serp"]/div/div/div[4]/div[{i}]/div/article/div[1]/div/div[1]/div/div[2]/div[1]/div'
@@ -59,9 +59,9 @@ def get_underground(xml, kol: int) -> list[dict]:
 
 def get_about_text(xml, kol: int) -> list[str]:
     about_ads = []
-    for i in range(1, kol):
+    for i in range(1, kol+1):
         exits_about = False
-        for j in range(1, 7):
+        for j in range(4, 7):
             path = f'//*[@id="frontend-serp"]/div/div/div[4]/div[{i}]/div/article/div[1]/div/div[1]/div/div[{j}]/div[2]/p'
             elem = xml.xpath(path)
             if elem:
@@ -79,9 +79,9 @@ def check_commission(text: str) -> bool:
 
 def get_description(xml, kol: int) -> list[str]:
     description = []
-    for i in range(1, kol):
+    for i in range(1, kol+1):
         exits_description = False
-        for j in range(1, 8):
+        for j in range(1, 5):
             path = f'//*[@id="frontend-serp"]/div/div/div[4]/div[{i}]/div/article/div[1]/div/div[1]/div/div[{j}]/div[2]/p'
             el = xml.xpath(path)
             if el:
@@ -96,7 +96,7 @@ def get_description(xml, kol: int) -> list[str]:
 
 def get_price(xml, kol: int) -> list[str]:
     price = []
-    for i in range(1, kol):
+    for i in range(1, kol+1):
         exist_price = False
         for j in range(1, 7):
             path = f'//*[@id="frontend-serp"]/div/div/div[4]/div[{i}]/div/article/div[1]/div/div[1]/div/div[{j}]/div[1]/span/span'
@@ -111,21 +111,32 @@ def get_price(xml, kol: int) -> list[str]:
     return price
 
 
+def get_geolocation(xml, kol: int) -> list[str]:
+    geolocation = []
+    for i in range(1, kol+1):
+        exists_address = False
+        address = ''
+        for j in range(1, 7):
+            path = f'//*[@id="frontend-serp"]/div/div/div[4]/div[{i}]/div/article/div[1]/div/div[1]/div/div[{j}]/div[2]'
+            if xml.xpath(path):
+                exists_address = True
+                for k in range(1, 8):
+                    path_total = path + f"/a[{k}]"
+                    el = xml.xpath(path_total)
+                    if el:
+                        address += el[0].text + " "
+        if address != '':
+            geolocation.append(address)
+        if not exists_address:
+            geolocation.append("nothing")
+
+    return geolocation
+
 
 def parse_all_data(url):
     soup = BeautifulSoup(get(url).text, "html.parser")
     xml = HTML(str(soup))
-    [print(el) for el in get_underground(xml, 20)]
-    print("\n\n\n")
-    [print(el) for el in get_main_photo(xml, 20)]
-    print("\n\n\n")
-    [print(el) for el in get_link(xml, 20)]
-    print("\n\n\n")
-    [print(el) for el in get_about_text(xml, 20)]
-    print("\n\n\n")
-    [print(el) for el in get_description(xml, kol=20)]
-    print("\n\n\n")
-    [print(el) for el in get_price(xml, kol=20)]
+
 
 
 
