@@ -29,7 +29,7 @@ def get_main_photo(xml, kol: int) -> list:
     return xpath_photo
 
 
-def get_underground(xml, kol: int) -> list[dict]:
+def get_underground(xml, kol: int) -> list[dict[str, str]]:
     underground = []
     for i in range(1, kol+1):
         path = (f'//*[@id="frontend-serp"]/div/div/div[4]/div[{i}]/div/article/div[1]/div/div[1]/div/div[2]/div['
@@ -133,15 +133,41 @@ def get_geolocation(xml, kol: int) -> list[str]:
     return geolocation
 
 
-def parse_all_data(url):
+def parse_all_data(url: str) -> list[dict]:
+    data_pars = []
+
     soup = BeautifulSoup(get(url).text, "html.parser")
     xml = HTML(str(soup))
 
+    geolocation = get_geolocation(xml, 10)
+    price = get_price(xml, 10)
+    about_txt = get_about_text(xml, 10)
+    underground = get_underground(xml, 10)
+    photo = get_main_photo(xml, 10)
+    links = get_link(xml, 10)
 
+    for i in range(len(links)):
+        if links[i] == "nothing":
+            continue
+
+        data = {
+            "id": links[i].split("/")[-2],
+            "link": links[i],
+            "price": price[i],
+            "photo": photo[i],
+            "underground": f"{underground[i]['metro']} | {underground[i]['time']}",
+            "no_commission": check_commission(about_txt[i]),
+            "address": geolocation[i].strip()
+        }
+
+        data_pars.append(data)
+
+    return data_pars
 
 
 
 
 if __name__ == "__main__":
     url_all = "https://cian.ru/cat.php?engine_version=2&p=1&with_neighbors=0&region=2&deal_type=rent&offer_type=flat&type=4"
-    parse_all_data(url_all)
+    for el in parse_all_data(url_all):
+        print(el)
