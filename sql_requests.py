@@ -24,14 +24,18 @@ def create_main_table(name_db=name_main_table):
     db.close()
 
 
-def new_information(id_ads: int):
+def new_information(id_ads: list[int]):
     db = connect(path_to_db)
     curr = db.cursor()
     try:
-        curr.execute(f"""
-            INSERT INTO {name_main_table} (ads) VALUES
-                (?)
-        """, (id_ads,))
+        last_id = get_information()
+        for id_el in id_ads:
+            if id_el in last_id:
+                continue
+            curr.execute(f"""
+                INSERT INTO {name_main_table} (ads) VALUES
+                    (?)
+            """, (id_el,))
     except Exception as ex:
         print(ex)
     finally:
@@ -39,7 +43,7 @@ def new_information(id_ads: int):
         db.close()
 
 
-def get_information() -> list[int]:
+def get_information() -> set[int]:
     db = connect(path_to_db)
     curr = db.cursor()
     try:
@@ -47,11 +51,11 @@ def get_information() -> list[int]:
             SELECT ads
             FROM {name_main_table}
         """)
-        return list(map(lambda el: el[0], curr.fetchall()))
+        return set(map(lambda el: el[0], curr.fetchall()))
     except Exception:
-        return [-1]
+        res = set()
+        res.add(-1)
+        return res
     finally:
         db.commit()
         db.close()
-
-
