@@ -1,3 +1,5 @@
+from sql_requests import new_information, get_information
+
 from lxml.etree import HTML
 from requests import get
 from bs4 import BeautifulSoup
@@ -133,7 +135,7 @@ def get_geolocation(xml, kol: int) -> list[str]:
     return geolocation
 
 
-def parse_all_data(url: str) -> list[dict]:
+def parse_all_data(url: str):
     data_pars = []
 
     soup = BeautifulSoup(get(url).text, "html.parser")
@@ -145,6 +147,8 @@ def parse_all_data(url: str) -> list[dict]:
     underground = get_underground(xml, 10)
     photo = get_main_photo(xml, 10)
     links = get_link(xml, 10)
+    last_id = get_information()
+    new_id = []
 
     for i in range(len(links)):
         if links[i] == "nothing":
@@ -160,14 +164,11 @@ def parse_all_data(url: str) -> list[dict]:
             "address": geolocation[i].strip()
         }
 
+        if int(data["id"]) in last_id:
+            continue
+
+        new_id.append(int(data["id"]))
         data_pars.append(data)
 
+    new_information(new_id)
     return data_pars
-
-
-
-
-if __name__ == "__main__":
-    url_all = "https://cian.ru/cat.php?engine_version=2&p=1&with_neighbors=0&region=2&deal_type=rent&offer_type=flat&type=4"
-    for el in parse_all_data(url_all):
-        print(el)
