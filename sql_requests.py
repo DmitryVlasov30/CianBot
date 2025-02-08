@@ -6,12 +6,12 @@ from sqlite3 import connect
 
 with open("config.json") as data:
     information = load(data)
-    path_to_db = Path(information["data_base_path"])
-    name_main_table = information["name_main_table"]
+    PATH_TO_DB = Path(information["data_base_path"])
+    NAME_MAIN_TABLE = information["name_main_table"]
 
 
-def create_main_table(name_db=name_main_table):
-    db = connect(path_to_db)
+def create_main_table(name_db=NAME_MAIN_TABLE):
+    db = connect(PATH_TO_DB)
     curr = db.cursor()
     curr.execute(f"""
         CREATE TABLE IF NOT EXISTS {name_db} (
@@ -25,7 +25,7 @@ def create_main_table(name_db=name_main_table):
 
 
 def new_information(id_ads: list[int]):
-    db = connect(path_to_db)
+    db = connect(PATH_TO_DB)
     curr = db.cursor()
     try:
         last_id = get_information()
@@ -33,7 +33,7 @@ def new_information(id_ads: list[int]):
             if id_el in last_id:
                 continue
             curr.execute(f"""
-                INSERT INTO {name_main_table} (ads) VALUES
+                INSERT INTO {NAME_MAIN_TABLE} (ads) VALUES
                     (?)
             """, (id_el,))
     except Exception as ex:
@@ -43,16 +43,17 @@ def new_information(id_ads: list[int]):
         db.close()
 
 
+# noinspection PyBroadException
 def get_information() -> set[int]:
-    db = connect(path_to_db)
+    db = connect(PATH_TO_DB)
     curr = db.cursor()
     try:
         curr.execute(f"""
             SELECT ads
-            FROM {name_main_table}
+            FROM {NAME_MAIN_TABLE}
         """)
         return set(map(lambda el: el[0], curr.fetchall()))
-    except Exception:
+    except:
         res = set()
         res.add(-1)
         return res
