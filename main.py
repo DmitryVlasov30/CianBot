@@ -2,6 +2,7 @@ from sql_requests import create_main_table
 from request_cian import parse_all_data
 
 from telebot import TeleBot
+from telebot.types import InputMediaPhoto
 from json import load
 from threading import Timer
 from random import shuffle, randint
@@ -25,7 +26,7 @@ NAME_LST = [
     "Лев", "София", "Артем", "Матвей", "Максим", "Роман",
     "Даниил", "Анастасия", "Алиса", "Милана" , "Виктория",
     "Анна", "Дмитрий", "Мария", "Иван", "Илья", "Кирилл",
-    "Виктор", "Александр", "Алексей", "Сергей", "Елизавета",
+    "Виктор", "Александр", "Алексей", "Сергей", "Елизавета"
 ]
 
 bot = TeleBot(token=TOKEN)
@@ -58,10 +59,21 @@ try:
         data = parse_all_data(url)
         for el in data:
             message = format_message(el)
-            if el["photo"] != "nothing":
+            if el["photo"] == "nothing":
+                bot.send_message(chat_id=ADMIN, text=message, parse_mode='html')
+                continue
+            if len(el["photo"]) == 1:
                 bot.send_photo(chat_id=ADMIN, photo=el["photo"][0], caption=message, parse_mode='html')
                 continue
-            bot.send_message(chat_id=ADMIN, text=message, parse_mode='html')
+            if len(el["photo"]) > 1:
+                media = []
+                for i, photo in enumerate(el["photo"]):
+                    if not i:
+                        media.append(InputMediaPhoto(media=photo, caption=message, parse_mode="html"))
+                        continue
+                    media.append(InputMediaPhoto(media=photo))
+
+                bot.send_media_group(chat_id=ADMIN, media=media)
 
 
 except Exception as all_mistake:
