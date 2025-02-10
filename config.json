@@ -1,0 +1,9 @@
+{
+  "token": "YOUR TOKEN BOT",
+  "interval": "INTERVAL REQUESTS (INT)",
+  "admin": "YOU CHAT ID",
+  "city_tg": "[CITY, CHANNEL]",
+  "loger_path": "PATH TO LOG FILE",
+  "data_base_path": "PATH TO DATABASE FILE",
+  "name_main_table": "NAME YOUR TABLE"
+}
