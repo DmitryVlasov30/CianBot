@@ -22,11 +22,22 @@ def get_main_photo(xml, kol: int) -> list:
     xpath_photo = []
     for i in range(1, kol+1):
         path = f'//*[@id="frontend-serp"]/div/div/div[4]/div[{i}]/div/article/div[1]/a/div[1]/div/ul/li[1]/div/img'
+        path_second_photo = f'//*[@id="frontend-serp"]/div/div/div[4]/div[{i}]/div/article/div[1]/a/div[3]/div[1]/div/picture/img'
+        second_photo = xml.xpath(path_second_photo)
+        path_thirty_photo = f'//*[@id="frontend-serp"]/div/div/div[4]/div[{i}]/div/article/div[1]/a/div[3]/div[2]/div/picture/img'
+        thirty_photo = xml.xpah(path_thirty_photo)
         el = xml.xpath(path)
         if not el:
             xpath_photo.append("nothing")
             continue
-        xpath_photo.append(el[0].get('src'))
+        if not second_photo and not thirty_photo:
+            xpath_photo.append([el[0].get('src')])
+        elif not second_photo:
+            xpath_photo.append([el[0].get('src'), second_photo[0].get('src')])
+        elif not thirty_photo:
+            xpath_photo.append([el[0].get('src'), thirty_photo[0].get('src')])
+        else:
+            xpath_photo.append([el[0].get('src'), second_photo[0].get('src'), thirty_photo[0].get('src')])
 
     return xpath_photo
 
@@ -139,6 +150,7 @@ def parse_all_data(url: str):
     data_pars = []
 
     soup = BeautifulSoup(get(url).text, "html.parser")
+    print(soup)
     xml = HTML(str(soup))
 
     geolocation = get_geolocation(xml, 10)
@@ -172,3 +184,11 @@ def parse_all_data(url: str):
 
     new_information(new_id)
     return data_pars
+
+
+
+
+if __name__ == "__main__":
+    url_all = "https://cian.ru/cat.php?engine_version=2&p=1&with_neighbors=0&region=2&deal_type=rent&offer_type=flat&type=4"
+    for el in parse_all_data(url_all):
+        print(el)
