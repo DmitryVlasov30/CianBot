@@ -25,7 +25,7 @@ def get_main_photo(xml, kol: int) -> list:
         path_second_photo = f'//*[@id="frontend-serp"]/div/div/div[4]/div[{i}]/div/article/div[1]/a/div[3]/div[1]/div/picture/img'
         second_photo = xml.xpath(path_second_photo)
         path_thirty_photo = f'//*[@id="frontend-serp"]/div/div/div[4]/div[{i}]/div/article/div[1]/a/div[3]/div[2]/div/picture/img'
-        thirty_photo = xml.xpah(path_thirty_photo)
+        thirty_photo = xml.xpath(path_thirty_photo)
         el = xml.xpath(path)
         if not el:
             xpath_photo.append("nothing")
@@ -150,7 +150,6 @@ def parse_all_data(url: str):
     data_pars = []
 
     soup = BeautifulSoup(get(url).text, "html.parser")
-    print(soup)
     xml = HTML(str(soup))
 
     geolocation = get_geolocation(xml, 10)
