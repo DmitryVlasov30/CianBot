@@ -1,4 +1,3 @@
-from sql_requests import create_main_table
 from request_cian import parse_all_data
 
 from telebot import TeleBot
@@ -47,10 +46,9 @@ try:
 
 
     @bot.message_handler(commands=["start"])
+    @logger.catch
     def main(message):
         bot.send_message(ADMIN, "start")
-
-        create_main_table()
         start_timer(message)
 
 
@@ -61,9 +59,11 @@ try:
             message = format_message(el)
             if el["photo"] == "nothing":
                 bot.send_message(chat_id=ADMIN, text=message, parse_mode='html')
+                logger.info(f"public post link: {el['link']}")
                 continue
             if len(el["photo"]) == 1:
                 bot.send_photo(chat_id=ADMIN, photo=el["photo"][0], caption=message, parse_mode='html')
+                logger.info(f"public post link: {el['link']}")
                 continue
             if len(el["photo"]) > 1:
                 media = []
@@ -74,6 +74,7 @@ try:
                     media.append(InputMediaPhoto(media=photo))
 
                 bot.send_media_group(chat_id=ADMIN, media=media)
+                logger.info(f"public post link: {el['link']}")
 
 
 except Exception as all_mistake:
