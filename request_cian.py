@@ -186,13 +186,3 @@ class RequestCian:
 
         db.new_information(new_id)
         return data_pars
-
-
-def main(url_resp: str, kol_adv: int):
-    response = RequestCian(url_resp, kol_adv)
-    for el in response.parse_all_data():
-        print(el)
-
-
-url = "https://cian.ru/cat.php?engine_version=2&p=1&with_neighbors=0&region=2&deal_type=rent&offer_type=flat&type=4"
-main(url, 10)
