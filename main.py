@@ -1,4 +1,4 @@
-from request_cian import parse_all_data
+from request_cian import RequestCian
 
 from telebot import TeleBot
 from telebot.types import InputMediaPhoto
@@ -16,6 +16,7 @@ with open("config.json") as config:
     ADMIN = information["admin"]
     city = information["city_tg"]
     PATH_TO_LOG = information["loger_path"]
+    count_advertisements = information["count_advertisements"]
 
 url = "https://cian.ru/cat.php?engine_version=2&p=1&with_neighbors=0&region=2&deal_type=rent&offer_type=flat&type=4"
 
@@ -54,7 +55,8 @@ try:
 
     @logger.catch
     def posting_message():
-        data = parse_all_data(url)
+        response = RequestCian(url, count_advertisements)
+        data = response.parse_all_data()
         for el in data:
             message = format_message(el)
             if el["photo"] == "nothing":
