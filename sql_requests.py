@@ -4,7 +4,7 @@ from sqlite3 import connect
 
 
 class DataBase:
-    def __init__(self, name_db):
+    def __init__(self):
         with open("config.json") as data:
             information = load(data)
             self.__PATH_TO_DB = Path(information["data_base_path"])
