@@ -35,11 +35,13 @@ class RequestCian:
     def __get_main_photo(self) -> list:
         xpath_photo = []
         for i in range(1, self.__kol+1):
-            path = f'//*[@id="frontend-serp"]/div/div/div[4]/div[{i}]/div/article/div[1]/a/div[1]/div/ul/li[1]/div/img'
+            path = f'//*[@id="frontend-serp"]/div/div/div[4]/div[{i}]/div/article/div[1]/a/div[1]/div/ul/li[1]/div/div/img'
             path_second_photo = f'//*[@id="frontend-serp"]/div/div/div[4]/div[{i}]/div/article/div[1]/a/div[3]/div[1]/div/picture/img'
             second_photo = self.__xml.xpath(path_second_photo)
             path_thirty_photo = f'//*[@id="frontend-serp"]/div/div/div[4]/div[{i}]/div/article/div[1]/a/div[3]/div[2]/div/picture/img'
             thirty_photo = self.__xml.xpath(path_thirty_photo)
+            path_fourth_photo = f'//*[@id="frontend-serp"]/div/div/div[4]/div[{i}]/div/article/div[1]/a/div[3]/div[3]/div[1]/picture/img'
+            fourth_photo = self.__xml.xpath(path_fourth_photo)
             el = self.__xml.xpath(path)
             if not el:
                 xpath_photo.append("nothing")
@@ -50,8 +52,10 @@ class RequestCian:
                 xpath_photo.append([el[0].get('src'), second_photo[0].get('src')])
             elif not thirty_photo:
                 xpath_photo.append([el[0].get('src'), thirty_photo[0].get('src')])
+            elif not fourth_photo:
+                xpath_photo.append([el[0].get('src'), fourth_photo[0].get('src')])
             else:
-                xpath_photo.append([el[0].get('src'), second_photo[0].get('src'), thirty_photo[0].get('src')])
+                xpath_photo.append([el[0].get('src'), second_photo[0].get('src'), thirty_photo[0].get('src'), fourth_photo[0].get('src')])
 
         return xpath_photo
 
@@ -158,6 +162,7 @@ class RequestCian:
         about_txt = self.__get_price()
         underground = self.__get_underground()
         photo = self.__get_main_photo()
+        print(photo)
         links = self.__get_link()
 
         db = DataBase()
@@ -175,7 +180,7 @@ class RequestCian:
                 "photo": photo[i],
                 "underground": f"{underground[i]['metro']} | {underground[i]['time']}",
                 "no_commission": check_commission(about_txt[i]),
-                "address": geolocation[i].strip()
+                "address": geolocation[i].replace("Санкт-Петербург", "").strip()
             }
 
             if int(data["id"]) in last_id:
@@ -186,3 +191,8 @@ class RequestCian:
 
         db.new_information(new_id)
         return data_pars
+
+
+if __name__ == "__main__":
+    r = RequestCian("https://cian.ru/cat.php?engine_version=2&p=1&with_neighbors=0&region=2&deal_type=rent&offer_type=flat&type=4", 10)
+    print(r.parse_all_data())
