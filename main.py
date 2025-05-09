@@ -5,6 +5,8 @@ from telebot.types import InputMediaPhoto
 from json import load
 from threading import Timer
 from random import shuffle, randint
+from time import sleep
+
 
 from loguru import logger
 
@@ -41,9 +43,17 @@ try:
     def format_message(data_massage: dict) -> str:
         shuffle(NAME_LST)
         name = NAME_LST[randint(0, len(NAME_LST) - 1)]
-        return (f'Сдается квартира от <a href="{data_massage["link"]}">{name}</a>, метро: {data_massage["underground"]}\n'
-                   f'Цена: {data_massage["price"]}\n'
-                   f'Адрес: {data_massage["address"]}')
+        if data_massage["add_text"]:
+            return (f'Сдается квартира\n'
+                    f'Контакт: <a href="{data_massage["link"]}">{name}</a>, метро: {data_massage["underground"]}\n'
+                    f'Описание: {data_massage["add_text"]}\n'
+                    f'Цена: {data_massage["price"]}\n\n'
+                    f'Адрес: {data_massage["address"]}')
+
+        return (f'Сдается квартира\n'
+                f'Контакт: <a href="{data_massage["link"]}">{name}</a>, метро: {data_massage["underground"]}\n'
+                f'Цена: {data_massage["price"]}\n\n'
+                f'Адрес: {data_massage["address"]}')
 
 
     @bot.message_handler(commands=["start"])
@@ -59,6 +69,7 @@ try:
         data = response.parse_all_data()
         for el in data:
             message = format_message(el)
+            sleep(5)
             if el["photo"] == "nothing":
                 bot.send_message(chat_id=ADMIN, text=message, parse_mode='html')
                 logger.info(f"public post link: {el['link']}")
